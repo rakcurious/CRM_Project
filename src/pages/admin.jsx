@@ -11,12 +11,14 @@ import { ExportToCsv } from "export-to-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { getAllUsers, userUpdation } from "../api/user";
+import Loading from "../components/loading_skeleton";
 
 const Admin = () => {
   const [ticketStatusCount, setTicketStatusCount] = useState({});
   const [tableData, setTableData] = useState([]);
   const [userData, setUserData] = useState([]);
   const [message, setMessage] = useState("");
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const userid = localStorage.getItem("userId");
 
@@ -40,6 +42,7 @@ const Admin = () => {
       .then(function (response) {
         setTableData(response.data);
         updateTicketCount(response.data);
+        setDataLoaded(true);
       })
       .catch(function (error) {
         setMessage(error.response.data.message);
@@ -50,6 +53,7 @@ const Admin = () => {
     getAllUsers("")
       .then(function (response) {
         setUserData(response.data);
+        setDataLoaded(true);
       })
       .catch(function (error) {
         setMessage(error.response.data.message);
@@ -282,82 +286,114 @@ const Admin = () => {
 
   return (
     <>
-      <div className="flex flex-col px-10 bg-purple-300">
-        <div className="mb-2 flex justify-start gap-20 lg:gap-96 flex-row-reverse w-auto ">
-          <button
-            onClick={logoutfn}
-            className="mt-10 bg-purple-600 hover:bg-purple-800 transition-all hover:rounded-lg rounded-xl font-semibold text-lg  text-white h-12 w-32"
-          >
-            Log out
-          </button>
-          <div>
-            <p className="text-4xl text-purple-900 font-semibold text-center mt-8">
-              Welcome, Rakesh
-            </p>
-            <p className="text-xl font-medium  text-center mt-2 mb-8">
-              Take a quick look at your stats
-            </p>
+      {dataLoaded ? (
+        <div className="flex flex-col px-10 bg-purple-300">
+          <div className="mb-2 flex justify-start gap-20 lg:gap-96 flex-row-reverse w-auto ">
+            <button
+              onClick={logoutfn}
+              className="mt-10 bg-purple-600 hover:bg-purple-800 transition-all hover:rounded-lg rounded-xl font-semibold text-lg  text-white h-12 w-32"
+            >
+              Log out
+            </button>
+            <div>
+              <p className="text-4xl text-purple-900 font-semibold text-center mt-8">
+                Welcome, Rakesh
+              </p>
+              <p className="text-xl font-medium  text-center mt-2 mb-8">
+                Take a quick look at your stats
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex justify-around mb-10 flex-wrap">
-          <Widget
-            colortop="bg-blue-600"
-            colorbottom="bg-blue-500"
-            svg={openicon}
-            text="Open"
-            percentage={percentages[0]}
-            barcolor="#1e40af"
-            value={ticketStatusCount.open}
-          />
-          <Widget
-            colortop="bg-yellow-600"
-            colorbottom="bg-yellow-500"
-            svg={progressicon}
-            text="Progress"
-            percentage={percentages[1]}
-            barcolor="#a16207"
-            value={ticketStatusCount.progress}
-          />
-          <Widget
-            colortop="bg-green-600"
-            colorbottom="bg-green-500"
-            svg={closedicon}
-            text="Closed"
-            percentage={percentages[2]}
-            barcolor="#14532d"
-            value={ticketStatusCount.closed}
-          />
-          <Widget
-            colortop="bg-neutral-600"
-            colorbottom="bg-neutral-500"
-            svg={blockedicon}
-            text="Blocked"
-            percentage={percentages[3]}
-            barcolor="#171717"
-            value={ticketStatusCount.blocked}
-          />
-        </div>
-        <div className="mb-20">
+          <div className="flex justify-around mb-10 flex-wrap">
+            <Widget
+              colortop="bg-blue-600"
+              colorbottom="bg-blue-500"
+              svg={openicon}
+              text="Open"
+              percentage={percentages[0]}
+              barcolor="#1e40af"
+              value={ticketStatusCount.open}
+            />
+            <Widget
+              colortop="bg-yellow-600"
+              colorbottom="bg-yellow-500"
+              svg={progressicon}
+              text="Progress"
+              percentage={percentages[1]}
+              barcolor="#a16207"
+              value={ticketStatusCount.progress}
+            />
+            <Widget
+              colortop="bg-green-600"
+              colorbottom="bg-green-500"
+              svg={closedicon}
+              text="Closed"
+              percentage={percentages[2]}
+              barcolor="#14532d"
+              value={ticketStatusCount.closed}
+            />
+            <Widget
+              colortop="bg-neutral-600"
+              colorbottom="bg-neutral-500"
+              svg={blockedicon}
+              text="Blocked"
+              percentage={percentages[3]}
+              barcolor="#171717"
+              value={ticketStatusCount.blocked}
+            />
+          </div>
+          <div className="mb-20">
+            <MaterialReactTable
+              columns={columns}
+              data={tableData}
+              editingMode="modal"
+              enableEditing
+              onEditingRowSave={handleSaveRow}
+              renderTopToolbarCustomActions={() => (
+                <div className="flex justify-between items-center bg-purple-500/40 rounded w-full">
+                  <h2 className="text-3xl font-semibold mx-20">
+                    Ticket Details
+                  </h2>
+                  <div className="flex gap-4 p-2 flex-wrap">
+                    <button
+                      className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleExportCsv}
+                    >
+                      Export as CSV
+                    </button>
+                    <button
+                      className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleExportPdf}
+                    >
+                      Export as PDF
+                    </button>
+                  </div>
+                </div>
+              )}
+            />
+          </div>
+
           <MaterialReactTable
-            columns={columns}
-            data={tableData}
+            columns={userColumns}
+            data={userData}
             editingMode="modal"
             enableEditing
-            onEditingRowSave={handleSaveRow}
+            onEditingRowSave={handleSaveRowUser}
             renderTopToolbarCustomActions={() => (
               <div className="flex justify-between items-center bg-purple-500/40 rounded w-full">
-                <h2 className="text-3xl font-semibold mx-20">Ticket Details</h2>
+                <h2 className="text-3xl font-semibold mx-20">User Details</h2>
+                <p className="text-xl font-semibold text-red-700">{message}</p>
                 <div className="flex gap-4 p-2 flex-wrap">
                   <button
                     className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleExportCsv}
+                    onClick={handleExportCsvUser}
                   >
                     Export as CSV
                   </button>
                   <button
                     className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleExportPdf}
+                    onClick={handleExportPdfUser}
                   >
                     Export as PDF
                   </button>
@@ -366,35 +402,20 @@ const Admin = () => {
             )}
           />
         </div>
-
-        <MaterialReactTable
-          columns={userColumns}
-          data={userData}
-          editingMode="modal"
-          enableEditing
-          onEditingRowSave={handleSaveRowUser}
-          renderTopToolbarCustomActions={() => (
-            <div className="flex justify-between items-center bg-purple-500/40 rounded w-full">
-              <h2 className="text-3xl font-semibold mx-20">User Details</h2>
-              <p className="text-xl font-semibold text-red-700">{message}</p>
-              <div className="flex gap-4 p-2 flex-wrap">
-                <button
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-                  onClick={handleExportCsvUser}
-                >
-                  Export as CSV
-                </button>
-                <button
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-                  onClick={handleExportPdfUser}
-                >
-                  Export as PDF
-                </button>
-              </div>
-            </div>
-          )}
-        />
-      </div>
+      ) : (
+        <div class="animate-pulse h-max w-screen">
+          <p className="text-neutral-400 text-6xl font-mono my-10 text-center">
+            Loading...
+          </p>
+          <div className="flex justify-around mt-10 flex-wrap h-auto w-auto">
+            <Loading />
+            <Loading />
+            <Loading />
+            <Loading />
+          </div>
+          <div className="h-screen w-4/5 ml-40 mt-10 bg-slate-300"></div>
+        </div>
+      )}
     </>
   );
 };
