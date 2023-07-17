@@ -204,7 +204,7 @@ function Login() {
           </span>
 
           <input
-            type="text"
+            type="password"
             name="password"
             value={password}
             onChange={(e) => updateLoginData(e)}
