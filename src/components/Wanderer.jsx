@@ -8,7 +8,7 @@ function Wanderer() {
   return (
     <>
       <div class="relative h-screen overflow-hidden bg-indigo-900">
-        <img src={spacemoon} class="absolute object-cover w-full h-full" />
+        <img src={spacemoon} alt="background" class="absolute object-cover w-full h-full" />
         <div class="absolute inset-0 bg-black opacity-25"></div>
         <div class="container relative z-10 flex items-center px-6 py-32 mx-auto md:px-12 xl:py-32">
           <div class="relative z-10 flex flex-col items-center w-full font-mono">

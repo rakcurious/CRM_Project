@@ -83,11 +83,11 @@ function Login() {
   return (
     <div className="login relative overflow-hidden flex items-center justify-center lg:justify-start h-screen">
       <img
-        src={background}
+        src={background} alt="background"
         className="absolute object-cover w-full h-full -z-10"
       />
       <img
-        src={rocketman}
+        src={rocketman} alt="illustration"
         className={`${
           signup
             ? "hidden lg:inline absolute -top-20 -right-60 lg:top-14 w-3/4  h-3/4 -z-10"
@@ -161,7 +161,7 @@ function Login() {
           </span>
 
           <input
-            type="text"
+            type="text" 
             name="userid"
             value={userId}
             onChange={(e) => updateLoginData(e)}
